@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Music Player</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        
+        .music-player {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            width: 300px;
+        }
+        
+        .player-controls {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px;
+            background-color: #2196f3;
+            color: #fff;
+        }
+        
+        #volume {
+            width: 80px;
+        }
+        
+        .playlist {
+            padding: 10px;
+        }
+        
+        #search {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+        
+        #music-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        #music-list li {
+            padding: 5px;
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+        }
+        
+        #music-list li:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="music-player">
+        <div class="player-controls">
+            <button id="prev">Prev</button>
+            <button id="play">Play</button>
+            <button id="next">Next</button>
+            <input type="range" id="volume" min="0" max="1" step="0.1">
+        </div>
+        <div class="playlist">
+            <input type="text" id="search" placeholder="Search music...">
+            <ul id="music-list">
+                <!-- Songs will be dynamically added here -->
+            </ul>
+        </div>
+    </div>
+    <audio id="audio-player"></audio>
+    <script>
+        const musicList = [
+            { title: "AHuevo-Luna", src: "./Assets/MusicList/AHuevo-Luna.mp3" },
+            { title: "Espeluznante-Luna", src: "./Assets/MusicList/Espeluznante-Luna.mp3" },
+            { title: "Headlands-National", src: "./Assets/MusicList/Headlands-National.mp3" }
+        ];
+        
+        let currentSongIndex = 0;
+        const audioPlayer = document.getElementById('audio-player');
+        const playButton = document.getElementById('play');
+        const nextButton = document.getElementById('next');
+        const prevButton = document.getElementById('prev');
+        const volumeControl = document.getElementById('volume');
+        const searchInput = document.getElementById('search');
+        const musicListElement = document.getElementById('music-list');
+        
+        function loadSong(index) {
+            audioPlayer.src = musicList[index].src;
+        }
+        
+        function playPauseSong() {
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+                playButton.textContent = "Pause";
+            } else {
+                audioPlayer.pause();
+                playButton.textContent = "Play";
+            }
+        }
+        
+        function nextSong() {
+            currentSongIndex = (currentSongIndex + 1) % musicList.length;
+            loadSong(currentSongIndex);
+            audioPlayer.play();
+            playButton.textContent = "Pause";
+        }
+        
+        function prevSong() {
+            currentSongIndex = (currentSongIndex - 1 + musicList.length) % musicList.length;
+            loadSong(currentSongIndex);
+            audioPlayer.play();
+            playButton.textContent = "Pause";
+        }
+        
+        function setVolume() {
+            audioPlayer.volume = volumeControl.value;
+        }
+        
+        function filterSongs() {
+            const searchText = searchInput.value.toLowerCase();
+            const filteredSongs = musicList.filter(song => song.title.toLowerCase().includes(searchText));
+            renderMusicList(filteredSongs);
+        }
+        
+        function renderMusicList(songs) {
+            musicListElement.innerHTML = '';
+            songs.forEach((song, index) => {
+                const li = document.createElement('li');
+                li.textContent = song.title;
+                li.addEventListener('click', () => {
+                    loadSong(index);
+                    audioPlayer.play();
+                    playButton.textContent = "Pause";
+                });
+                musicListElement.appendChild(li);
+            });
+        }
+        
+        playButton.addEventListener('click', playPauseSong);
+        nextButton.addEventListener('click', nextSong);
+        prevButton.addEventListener('click', prevSong);
+        volumeControl.addEventListener('input', setVolume);
+        searchInput.addEventListener('input', filterSongs);
+        
+        // Initial render
+        renderMusicList(musicList);
+        loadSong(currentSongIndex);
+    </script>
+</body>
+</html>
